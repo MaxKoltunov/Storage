@@ -1,0 +1,15 @@
+name: Short description of change
+tag: PATCH
+databaseChangeLog:
+  - changeSet:
+      id: 5
+      author: Max
+      changes:
+        - sqlFile:
+            path: changeLogs/storageSchema/createSchemaAndSeq.sql
+  - changeSet:
+      id: 6
+      author: Max
+      changes:
+        - sqlFile:
+            path: changeLogs/storageSchema/storageSchema.sql
