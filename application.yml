@@ -17,7 +17,10 @@ spring:
   kafka:
     bootstrap-servers: localhost:9092
     consumer:
-      group-id: webApp
+      group-id: storage
       auto-offset-reset: earliest
       properties:
         spring.json.trusted.packages: '*'
+
+server:
+  port: 8082

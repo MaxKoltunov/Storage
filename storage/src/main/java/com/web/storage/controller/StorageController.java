@@ -27,12 +27,12 @@ public class StorageController {
         storageService.addProduct(dto.getName(), dto.getType(), dto.getBrand(), dto.getRec_cost());
         return "A new product has been added to the storage";
     }
-    // curl -X POST "http://localhost:8080/api/storage/add" -H "Content-Type: application/json" -d "{\"name\": \"test_product\", \"type\": \"test_type\", \"brand\": \"test_brand\", \"rec_cost\": 123}"
+    // curl -X POST "http://localhost:8082/api/storage/add" -H "Content-Type: application/json" -d "{\"name\": \"test_product\", \"type\": \"test_type\", \"brand\": \"test_brand\", \"rec_cost\": 123}"
 
     @DeleteMapping("/delete")
     public String deleteProduct(@RequestBody DTO dto) {
         storageService.deleteProduct(dto.getName(), dto.getType(), dto.getBrand(), dto.getRec_cost());
         return "Product has been deleted";
     }
-    // curl -X DELETE "http://localhost:8080/api/storage/delete" -H "Content-Type: application/json" -d "{\"name\": \"test_product\", \"type\": \"test_type\", \"brand\": \"test_brand\", \"rec_cost\": 123}"
+    // curl -X DELETE "http://localhost:8082/api/storage/delete" -H "Content-Type: application/json" -d "{\"name\": \"test_product\", \"type\": \"test_type\", \"brand\": \"test_brand\", \"rec_cost\": 123}"
 }
