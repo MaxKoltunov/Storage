@@ -23,7 +23,7 @@ public class StorageService {
         storageProduct.setName(name);
         storageProduct.setType(type);
         storageProduct.setBrand(brand);
-        storageProduct.setRec_cost(rec_cost);
+        storageProduct.setRecCost(rec_cost);
         return storageRepository.save(storageProduct);
     }
 

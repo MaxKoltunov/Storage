@@ -23,8 +23,8 @@ public class StorageProduct {
     @Column(name = "brand", nullable = false)
     private String brand;
 
-    @Column(name = "rec_cost", nullable = false)
-    private Long rec_cost;
+    @Column(name = "recCost", nullable = false)
+    private Long recCost;
 
 
     public Long getId() {
@@ -59,11 +59,11 @@ public class StorageProduct {
         this.brand = brand;
     }
 
-    public Long getRec_cost() {
-        return rec_cost;
+    public Long getRecCost() {
+        return recCost;
     }
 
-    public void setRec_cost(Long rec_cost) {
-        this.rec_cost = rec_cost;
+    public void setRecCost(Long recCost) {
+        this.recCost = recCost;
     }
 }

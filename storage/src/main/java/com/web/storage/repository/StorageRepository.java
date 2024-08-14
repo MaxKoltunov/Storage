@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -20,4 +21,7 @@ public interface StorageRepository extends JpaRepository<StorageProduct, Long> {
 
     @Query(value = "SELECT * FROM storageschema.storage WHERE id = :id", nativeQuery = true)
     Optional<StorageProduct> findById(Long id);
+
+    @Query(value = "SELECT id FROM storageschema.storage", nativeQuery = true)
+    List<Long> getAllIds();
 }
