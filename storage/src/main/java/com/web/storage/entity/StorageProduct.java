@@ -2,7 +2,13 @@ package com.web.storage.entity;
 
 
 import jakarta.persistence.*;
+import lombok.*;
 
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 @Entity
 @Table(name = "storage", schema = "storageschema")
 public class StorageProduct {
@@ -25,45 +31,4 @@ public class StorageProduct {
 
     @Column(name = "recCost", nullable = false)
     private Long recCost;
-
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
-
-    public String getBrand() {
-        return brand;
-    }
-
-    public void setBrand(String brand) {
-        this.brand = brand;
-    }
-
-    public Long getRecCost() {
-        return recCost;
-    }
-
-    public void setRecCost(Long recCost) {
-        this.recCost = recCost;
-    }
 }

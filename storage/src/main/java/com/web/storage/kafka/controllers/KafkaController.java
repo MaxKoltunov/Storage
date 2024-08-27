@@ -4,10 +4,13 @@ package com.web.storage.kafka.controllers;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.web.storage.entity.StorageProduct;
+import com.web.storage.exceptions.EmptyStorageException;
+import com.web.storage.exceptions.ObjectNotFoundException;
 import com.web.storage.kafka.dto.KafkaStorageMessage;
 import com.web.storage.kafka.dto.MessageDTO;
 import com.web.storage.kafka.producers.KafkaProducerService;
 import com.web.storage.repository.StorageRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -23,6 +26,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/storage")
 public class KafkaController {
@@ -35,7 +39,8 @@ public class KafkaController {
 
 
     @PostMapping("/send")
-    public String sendMessage(@RequestBody MessageDTO messageDTO) {
+    public void sendMessage(@RequestBody MessageDTO messageDTO) {
+        log.info("sendMessage() - starting");
         Optional<StorageProduct> storageProductOpt = storageRepository.findById(messageDTO.getId());
         if (storageProductOpt.isPresent()) {
             StorageProduct product = storageProductOpt.get();
@@ -48,13 +53,14 @@ public class KafkaController {
             } else {
                 cost = messageDTO.getCost();
             }
-            KafkaStorageMessage storageMessage = new KafkaStorageMessage();
-            storageMessage.setName(name);
-            storageMessage.setType(type);
-            storageMessage.setBrand(brand);
-            storageMessage.setCost(cost);
-            storageMessage.setArrivalDate(messageDTO.getArrivalDate());
-            storageMessage.setDiscountId(messageDTO.getDiscountId());
+            KafkaStorageMessage storageMessage = KafkaStorageMessage.builder()
+                    .name(name)
+                    .type(type)
+                    .brand(brand)
+                    .cost(cost)
+                    .arrivalDate(messageDTO.getArrivalDate())
+                    .discountId(messageDTO.getDiscountId())
+                    .build();
             if (messageDTO.getAmount() != null) {
                 storageMessage.setAmount(messageDTO.getAmount());
             }
@@ -66,9 +72,9 @@ public class KafkaController {
             } catch (JsonProcessingException e) {
                 throw new RuntimeException(e);
             }
-            return "Message was sent";
+           log.info("Message was sent");
         } else {
-            return "There is no such product in the storage";
+            throw new ObjectNotFoundException("There is no such product in the storage");
         }
     }
 
@@ -76,12 +82,13 @@ public class KafkaController {
     // curl -X POST "http://localhost:8082/api/storage/send" -H "Content-Type: application/json" -d "{\"id\": 7, \"cost\": 60, \"arrivalDate\": \"2024-08-10T08:00:00+05:00\", \"discountId\": null, \"amount\": 10}"
 
     @Scheduled(fixedRate = 60000)
-    public String sendScheduledMessage() {
+    public void sendScheduledMessage() {
+        log.info("sendScheduledMessage() - starting");
 
         List<Long> storageIds = storageRepository.getAllIds();
 
         if (storageIds.isEmpty()) {
-            return "There are no products in the storage";
+            throw new EmptyStorageException("There are no products in the storage");
         }
 
         Random random = new Random();
@@ -91,7 +98,7 @@ public class KafkaController {
         Optional<StorageProduct> productOpt = storageRepository.findById(randomId);
 
         if (productOpt.isEmpty()) {
-            return "There is no product with this id";
+            throw new ObjectNotFoundException("There is no such product in the storage");
         }
 
         StorageProduct product = productOpt.get();
@@ -101,14 +108,14 @@ public class KafkaController {
         LocalDateTime localDateTime = zonedDateTime.toLocalDateTime();
         Timestamp arrivalDate = Timestamp.valueOf(localDateTime);
 
-        KafkaStorageMessage kafkaStorageMessage = new KafkaStorageMessage();
-        kafkaStorageMessage.setName(product.getName());
-        kafkaStorageMessage.setType(product.getType());
-        kafkaStorageMessage.setBrand(product.getBrand());
-        kafkaStorageMessage.setCost(product.getRecCost() + random.nextLong(31) - 15);
-        kafkaStorageMessage.setArrivalDate(arrivalDate);
-        kafkaStorageMessage.setAmount(random.nextLong(100));
-
+        KafkaStorageMessage kafkaStorageMessage = KafkaStorageMessage.builder()
+                .name(product.getName())
+                .type(product.getType())
+                .brand(product.getBrand())
+                .cost(product.getRecCost() + random.nextLong(31) - 15)
+                .arrivalDate(arrivalDate)
+                .amount(random.nextLong(100))
+                .build();
 
         ObjectMapper objectMapper = new ObjectMapper();
         try {
@@ -118,6 +125,6 @@ public class KafkaController {
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
-        return "Message was sent";
+        log.info("Message was sent");
     }
 }
